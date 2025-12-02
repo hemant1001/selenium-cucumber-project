@@ -1,39 +1,52 @@
 package com.example;
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
-import io.cucumber.java.en.Then;
-import static org.junit.Assert.assertTrue;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.*;
+import java.time.Duration;
 
 public class SeleniumSteps {
 
-    private WebDriver driver;
+    public WebDriver driver;
 
-    @Given("browser is ready")
-    public void browser_is_ready() {
-        // Setup ChromeDriver via WebDriverManager
-        WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        // run headless by default so CI/local without display works
-        options.addArguments("--headless", "--disable-gpu", "--no-sandbox");
-        driver = new ChromeDriver(options);
+    public void openLoginPage() {
+        driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.manage().window().maximize();
+        driver.get("https://rahulshettyacademy.com/loginpagePractise/");
     }
 
-    @When("I open example.com")
-    public void i_open_example_com() {
-        driver.get("https://example.com");
+    public void enterCredentials() {
+        driver.findElement(By.id("username")).sendKeys("rahulshettyacademy");
+        driver.findElement(By.id("password")).sendKeys("learning");
     }
 
-    @Then("page title contains Example")
-    public void page_title_contains_example() {
-        String title = driver.getTitle();
-        assertTrue("Title should contain Example", title.contains("Example"));
-        if (driver != null) {
-            driver.quit();
-        }
+    public void selectUserRadio() {
+        driver.findElement(By.xpath("//input[@value='user']")).click();
+    }
+
+    public void clickOkayButton() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("okayBtn"))).click();
+    }
+
+    public void selectDropdown() {
+        Select opt = new Select(driver.findElement(By.cssSelector("select.form-control")));
+        opt.selectByIndex(2);
+    }
+
+    public void acceptTermsAndLogin() {
+        driver.findElement(By.id("terms")).click();
+        driver.findElement(By.id("signInBtn")).click();
+    }
+
+    public boolean isLoginSuccessful() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.urlContains("shop"));
+        return true;
+    }
+
+    public void closeBrowser() {
+        driver.quit();
     }
 }
